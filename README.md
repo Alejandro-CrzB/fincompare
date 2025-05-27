@@ -1,3 +1,4 @@
+## Fincompare
 # Abstract
 This project is an investment return comparator. It compares historical data of returns of public retirement options in Mexico against historical returns of various stock markets. **FinCompare** is a cloud-based microservice designed as a Minimum Viable Product (MVP) for a Cloud Computing course. It allows users to simulate and compare the returns of saving a fixed amount of money in a traditional savings account (AFORE, Mexico's retirement system) versus investing it in various stock market assets, including major indices and individual stocks (e.g., FAANG companies).
 
