@@ -56,6 +56,10 @@ def comparar_inversion(request):
         "SP500": "^GSPC",
         "NASDAQ": "^IXIC",
         "APPLE": "AAPL",
+        'AMAZON': 'AMZN',
+        'GOOGLE': 'GOOGL',
+        'META': 'META',
+        'NETFLIX': 'NFLX'
     }
 
     for nombre, ticker in tickers.items():
