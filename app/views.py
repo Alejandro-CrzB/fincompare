@@ -1,6 +1,8 @@
 import yfinance as yf
 from django.http import JsonResponse
 from datetime import datetime, timedelta
+from .utils import calcular_rendimiento_real, obtener_rendimiento_yahoo
+
 
 # Fixed parameters
 RENDIMIENTO_PROMEDIO_AFORE = 0.065  # 6.5% per annum net historical
