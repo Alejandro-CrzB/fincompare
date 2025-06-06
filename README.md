@@ -1,167 +1,104 @@
 ### FinCompare
 ## Abstract
-FinCompare is an investment return comparator microservice that allows users to compare historical returns of Mexico’s public retirement funds (Afores) with those of various stock market assets. Designed as a Minimum Viable Product (MVP) for a Cloud Computing course, this Django-based service provides real-time comparisons through a simple API endpoint. Users can simulate the growth of a fixed principal amount invested in a traditional savings vehicle (Afore) versus investing in major indices or individual stocks (e.g., FAANG companies).
+FinCompare is an investment return comparator microservice that lets users compare historical returns of Mexico’s public retirement funds (Afores) with those of various stock market assets. Designed as a Minimum Viable Product (MVP) for a Cloud Computing course, this Django-based service provides real-time comparisons through a simple API endpoint. Users can simulate the growth of a fixed principal amount invested in a traditional retirement vehicle (Afore) versus investing in major indices or individual stocks (for example, FAANG companies).
 
 ## Introduction
-In Mexico, options for retirement savings can be limited, fragmented, or confusing for the average person. FinCompare was created to centralize information on Afores and overlay it with historical performance data of global markets, empowering users to make data-driven decisions about where to allocate their retirement assets. By visualizing and comparing yields side by side—ranging from low-risk, government-backed Afore accounts to higher-risk equity investments—FinCompare helps users identify which strategy best aligns with their risk tolerance and financial goals.
+In Mexico, options for retirement savings can be limited, fragmented, and confusing for the average person. FinCompare was created to centralize information on Afores and overlay it with historical performance data of global markets, empowering users to make data-driven decisions about where to allocate their retirement assets. By visualizing and comparing returns side by side—ranging from low-risk, government-backed Afore accounts to higher-risk equity investments—FinCompare helps users identify which strategy best aligns with their risk tolerance and financial goals.
 
 ## Importance
-Promoting an investment culture in Mexico is critical for improving financial literacy and long-term wealth building. FinCompare’s mission is to inspire users to consider alternatives beyond traditional savings accounts and to make informed decisions that foster financial independence. By offering transparent, side-by-side comparisons of retirement fund options, this project aspires to close the information gap and encourage users to take charge of their financial future.
+Promoting an investment culture in Mexico is critical for improving financial literacy and long-term wealth building. FinCompare’s mission is to inspire users to consider alternatives beyond traditional savings accounts and make informed decisions that foster financial independence. By offering transparent, side-by-side comparisons of retirement fund options, this project aims to close the information gap and encourage users to take charge of their financial future.
 
 ## Features
-Investment Growth Calculator: Computes and compares growth of a user-defined principal in:
+Investment Growth Calculator
+Computes and compares growth of a user-defined principal in:
 
 Afore (using a fixed annual return rate).
 
-Historical performance of stock market indices and select equities via the Yahoo Finance API.
+Stock market indices and select equities via the Yahoo Finance API.
 
-## Data Sources:
+Data Sources
 
-Afore: Assumes a net annual rate of return (configurable, e.g., 5% compounded annually).
+Afore: Assumes a net annual rate of return (default: 5% compounded annually).
 
 Stock Markets: Retrieves historical price data for major indices and popular stocks (S&P 500, NASDAQ, Dow Jones, Apple, Amazon, Google [Alphabet], Meta [Facebook], Netflix) using the yfinance library.
 
-Output: Returns a clean JSON response summarizing final portfolio values, cumulative returns, and percentage differentials between Afore and equity investments.
+Output
+Returns a clean JSON response summarizing final portfolio values, cumulative returns, and percentage differences between the Afore and equity investments.
 
-Dockerized Deployment: Packaged into Docker and orchestrated via Docker Compose for rapid, reproducible deployment on cloud platforms (e.g., AWS EC2).
+Dockerized Deployment
+Packaged into Docker and orchestrated via Docker Compose for rapid, reproducible deployment on cloud platforms (for example, AWS EC2).
 
-Backend-Only MVP: Focuses on core API functionality; exposes a simple web interface for entering parameters and triggering comparisons.
+Backend-Only MVP
+Focuses on core API functionality; exposes a simple web interface for entering parameters and triggering comparisons.
 
 ## How It Works
-User Input: The user visits the service’s web interface at http://78.13.85.189/ (replace with the active Elastic IP if different).
+User Input
+The user visits the service’s web interface at http://78.13.85.189/ (replace with the active Elastic IP if different).
 
-Parameter Entry: On the homepage, the user enters:
+Parameter Entry
+On the homepage, the user enters:
 
-Principal Amount (in Mexican Pesos, e.g., 10000).
+Principal Amount (for example, 10000 MXN).
 
-Investment Horizon (in years, e.g., 10).
+Investment Horizon in years (for example, 10).
 
-API Request: Upon clicking “Compare Returns”, the frontend issues a GET request to the /api/comparar_inversion/ endpoint, passing monto (amount) and anos (years) as query parameters.
+API Request
+When the user clicks “Compare Returns”, the frontend issues a GET request to the /api/comparar_inversion/ endpoint, passing amount and years as query parameters.
 
-Afore Calculation: The backend computes the future value of the principal in an Afore using a fixed annual net rate (e.g., 5% per annum, compounded yearly).
+Afore Calculation
+The backend computes the future value of the principal in an Afore using a fixed annual net rate (for example, 5% per year, compounded annually).
 
-Formula:
+Plain text formula:
 
-Valor Afore
-=
-monto
-×
-(
-1
-+
-𝑟
-Afore
-)
-anos
- 
-Valor Afore=monto×(1+r 
-Afore
-​
- ) 
-anos
- 
-where 
-𝑟
-Afore
-r 
-Afore
-​
-  is the net annual return rate (default: 0.05).
+ini
+Copiar
+Editar
+Value_in_Afore = principal * (1 + annual_afore_rate) ^ years
+where annual_afore_rate is the net annual return rate (default: 0.05).
 
-Equity Calculation: Using the yfinance Python package, the service fetches historical daily closing prices for one or more selected tickers (e.g., ^GSPC for S&P 500) over the same horizon. It calculates the equivalent compounded return of investing the principal at the earliest available date to the present (or the specified number of years ago).
+Equity Calculation
+Using the yfinance Python package, the service fetches historical daily closing prices for one or more selected tickers (for example, ^GSPC for S&P 500) over the same horizon. It calculates the compounded return of investing the principal at the date exactly years ago compared to today.
 
-The code computes:
+Plain text formula:
 
-Valor 
-I
-ˊ
-ndice/Acci
-o
-ˊ
-n
-=
-monto
-×
-𝑃
-hoy
-𝑃
-hace a
-n
-˜
-os
-Valor  
-I
-ˊ
- ndice/Acci 
-o
-ˊ
- n=monto× 
-P 
-hace a 
-n
-˜
- os
-​
- 
-P 
-hoy
-​
- 
-​
- 
-where 
-𝑃
-hoy
-P 
-hoy
-​
-  is the closing price today and 
-𝑃
-hace a
-n
-˜
-os
-P 
-hace a 
-n
-˜
- os
-​
-  is the closing price exactly 
-anos
-anos years prior.
+ini
+Copiar
+Editar
+Value_IndexOrStock = principal * (Price_today / Price_years_ago)
+where Price_today is the closing price today and Price_years_ago is the closing price exactly years ago.
 
-JSON Response: The API returns a JSON object of the form:
+JSON Response
+The API returns a JSON object of the form:
 
 json
 Copiar
 Editar
 {
-  "monto_inicial": 10000,
-  "anos": 10,
-  "retorno_afore": 16288.95,
-  "retorno_sp500": 23145.62,
-  "retorno_nasdaq": 28517.09,
-  "retorno_dowjones": 19875.12,
-  "retorno_apple": 42023.74,
-  "comparacion": {
-    "diferencia_sp500_vs_afore": 686.02,
-    "porcentaje_sp500_vs_afore": 42.0
+  "principal": 10000,
+  "years": 10,
+  "afore_return": 16288.95,
+  "sp500_return": 23145.62,
+  "nasdaq_return": 28517.09,
+  "dowjones_return": 19875.12,
+  "apple_return": 42023.74,
+  "comparison": {
+    "diff_sp500_vs_afore": 686.02,
+    "pct_sp500_vs_afore": 42.00
     // …etc.
   }
 }
-Frontend Display: While the MVP focuses on the JSON response, the template comparador.html (located under app/templates/app/) can be extended to visualize results in charts or tables. For now, users see a blank or minimal page with parameters; developers can modify it to display the JSON or render results dynamically.
+Frontend Display
+Although this MVP focuses on returning JSON, the template comparador.html (found under app/templates/app/) can be extended to display results in charts or tables. For now, users see a minimal page with input fields; developers can modify it later to render results dynamically.
 
-Regulatory Context: Afore Laws
+## Regulatory Context: Afore Laws
 Afores (Administradoras de Fondos para el Retiro) in Mexico are regulated under the Ley de los Sistemas de Ahorro para el Retiro (LSAR). This federal law governs how retirement funds are collected, managed, and invested. For more information, see the official publication of the law on the Mexican government’s website:
 
-Ley de los Sistemas de Ahorro para el Retiro (Texto Vigente) 
-gob.mx
+Ley de los Sistemas de Ahorro para el Retiro (Current Text)
 
 Technologies Used
-Python 3.9 (backend logic, calculations)
+Python 3.9 (backend logic and calculations)
 
-Django 5.x (web framework, API views)
+Django 5.x (web framework and API views)
 
 Docker & Docker Compose (containerization and deployment)
 
@@ -169,7 +106,7 @@ yfinance (Yahoo Finance API wrapper for retrieving historical market data)
 
 Git & GitHub (version control and repository management)
 
-AWS EC2 (Ubuntu Server) (target deployment environment for MPL/Elastic IP)
+AWS EC2 (Ubuntu Server) (target deployment environment with Elastic IP)
 
 ## Installation & Deployment
 1. Clone the Repository
@@ -181,7 +118,7 @@ cd fincompare
 2. Configure Environment Variables
 Create a .env file in the project root (next to docker-compose.yml) with contents similar to:
 
-dotenv
+env
 Copiar
 Editar
 DJANGO_SECRET_KEY=<your-secret-key>
@@ -201,14 +138,14 @@ Build the Django application into a Docker image.
 
 Launch two containers:
 
-web (running Django’s built-in development server or Gunicorn if configured).
+web (running Django’s development server or Gunicorn if configured).
 
 db (if you have a PostgreSQL or other database service defined; otherwise, skip or remove the DB service).
 
 Note: For production, replace Django’s development server with Gunicorn or uWSGI and configure a reverse proxy like Nginx. This README focuses on the MVP deployment for demonstration.
 
 4. Database Migrations (if applicable)
-If you’re using Django’s ORM with a database (e.g., SQLite by default), run:
+If you’re using Django’s ORM with a database (for example, SQLite by default), run:
 
 bash
 Copiar
@@ -230,7 +167,7 @@ cpp
 Copiar
 Editar
 http://78.13.85.189/ 
-Replace 78.13.85.189 with your EC2 Elastic IP or custom domain. You should see the minimal landing page with fields for Monto (amount) and Años (years). Enter a principal amount (e.g., 10000) and a horizon (e.g., 10) then click “Compare Returns”.
+Replace 78.13.85.189 with your EC2 Elastic IP or custom domain. You should see the minimal landing page with fields for Amount and Years. Enter a principal amount (for example, 10000) and a horizon (for example, 10), then click “Compare Returns”.
 
 Usage
 1. Web Interface
@@ -238,16 +175,16 @@ URL: http://<Elastic_IP>/
 
 Fields:
 
-Monto: Initial investment amount (e.g., 5000 for MXN 5,000).
+Amount: Initial investment amount (for example, 5000 MXN).
 
-Años: Number of years to project returns (e.g., 15).
+Years: Number of years to project returns (for example, 15).
 
 After submitting, the page makes an AJAX call to:
 
 php-template
 Copiar
 Editar
-http://<Elastic_IP>/api/comparar_inversion/?monto=<monto>&anos=<anos>
+http://<Elastic_IP>/api/comparar_inversion/?amount=<amount>&years=<years>
 2. API Endpoint
 Endpoint: /api/comparar_inversion/
 
@@ -255,37 +192,37 @@ Method: GET
 
 Query Parameters:
 
-monto (required): A positive integer/float representing principal in MXN.
+amount (required): A positive integer or float representing the principal in MXN.
 
-anos (required): A positive integer representing the investment horizon in years.
+years (required): A positive integer representing the investment horizon in years.
 
 Example Request
 http
 Copiar
 Editar
-GET /api/comparar_inversion/?monto=10000&anos=10 HTTP/1.1
+GET /api/comparar_inversion/?amount=10000&years=10 HTTP/1.1
 Host: 78.13.85.189
 Example JSON Response
 json
 Copiar
 Editar
 {
-  "monto_inicial": 10000,
-  "anos": 10,
-  "retorno_afore": 16288.95,
-  "retorno_sp500": 23145.62,
-  "retorno_nasdaq": 28517.09,
-  "retorno_dowjones": 19875.12,
-  "retorno_apple": 42023.74,
-  "retorno_amazon": 38655.88,
-  "retorno_google": 25512.30,
-  "retorno_meta": 17455.67,
-  "retorno_netflix": 13212.45,
-  "comparacion": {
-    "diferencia_sp500_vs_afore": 686.02,
-    "porcentaje_sp500_vs_afore": 42.00,
-    "diferencia_nasdaq_vs_afore": 12228.14,
-    "porcentaje_nasdaq_vs_afore": 75.05
+  "principal": 10000,
+  "years": 10,
+  "afore_return": 16288.95,
+  "sp500_return": 23145.62,
+  "nasdaq_return": 28517.09,
+  "dowjones_return": 19875.12,
+  "apple_return": 42023.74,
+  "amazon_return": 38655.88,
+  "google_return": 25512.30,
+  "meta_return": 17455.67,
+  "netflix_return": 13212.45,
+  "comparison": {
+    "diff_sp500_vs_afore": 686.02,
+    "pct_sp500_vs_afore": 42.00,
+    "diff_nasdaq_vs_afore": 12228.14,
+    "pct_nasdaq_vs_afore": 75.05
     // …etc.
   }
 }
@@ -296,7 +233,7 @@ python
 Copiar
 Editar
 RENDIMIENTO_PROMEDIO_AFORE = 0.05  # 5% net annual by default
-Yahoo Finance Tickers: In app/utils.py or equivalent utility file, update the list of tickers:
+Yahoo Finance Tickers: In app/utils.py or the equivalent utility file, update the list of tickers:
 
 python
 Copiar
@@ -375,14 +312,14 @@ Editar
 http://78.13.85.189/
 Enter:
 
-Monto (e.g., 10000)
+Amount (for example, 10000)
 
-Años (e.g., 10)
+Years (for example, 10)
 
 Click “Compare Returns”.
 
 The page will display or fetch via AJAX a JSON object with the comparison results.
 
-You can share the URL with your professor or classmates—anyone with a web browser and internet access to that Elastic IP can perform comparisons.
+You can share this URL with anyone—anyone with a web browser and internet access to that Elastic IP can perform comparisons.
 
 Thank you for exploring FinCompare. We welcome feedback and contributions via GitHub issues or pull requests.
