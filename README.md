@@ -48,24 +48,10 @@ When the user clicks “Compare Returns”, the frontend issues a GET request to
 Afore Calculation
 The backend computes the future value of the principal in an Afore using a fixed annual net rate (for example, 5% per year, compounded annually).
 
-Plain text formula:
-
-ini
-Copiar
-Editar
-Value_in_Afore = principal * (1 + annual_afore_rate) ^ years
-where annual_afore_rate is the net annual return rate (default: 0.05).
 
 Equity Calculation
 Using the yfinance Python package, the service fetches historical daily closing prices for one or more selected tickers (for example, ^GSPC for S&P 500) over the same horizon. It calculates the compounded return of investing the principal at the date exactly years ago compared to today.
 
-Plain text formula:
-
-ini
-Copiar
-Editar
-Value_IndexOrStock = principal * (Price_today / Price_years_ago)
-where Price_today is the closing price today and Price_years_ago is the closing price exactly years ago.
 
 JSON Response
 The API returns a JSON object of the form:
